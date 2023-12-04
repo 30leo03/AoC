@@ -43,10 +43,25 @@ def possible_pull(pull):
         return True
 
 
+def check_min_required_pow(game):
+    min_red = 0
+    min_gre = 0
+    min_blu = 0
+    for pull in game:
+        for hand in pull:
+            if hand[1] == 'red' and hand[0] > min_red:
+                min_red = hand[0]
+            elif hand[1] == 'green' and hand[0] > min_gre:
+                min_gre = hand[0]
+            elif hand[1] == 'blue' and hand[0] > min_blu:
+                min_blu = hand[0]
+    return min_red*min_gre*min_blu
+
+
 id_sum = 0
+min_pow = 0
 
 for game_number, pulls in games_content_tot:
-    print(f"Game {game_number} Pulls: {pulls}")
     should_add = True
     # this does not seem smart but well I do not care
     for p in pulls:
@@ -54,6 +69,9 @@ for game_number, pulls in games_content_tot:
             should_add = False
     if should_add:
         id_sum += int(game_number)
+    # confusing ahh argument
+    min_pow += check_min_required_pow(game=pulls)
 
 print(id_sum)
+print(min_pow)
 
