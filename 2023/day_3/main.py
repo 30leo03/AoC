@@ -45,7 +45,7 @@ for y, l in enumerate(input_list):
                 current_number = ""
 
 part1_answer = 0
-for number, x1, x2, Y in number_list:   # Y is index
+for number, x1, x2, Y in number_list:   # Y is index/line number
     border_points = set()
     for y in range(Y-1, Y+2):
         for x in range(x1 - 1, x2 + 2):
@@ -53,6 +53,7 @@ for number, x1, x2, Y in number_list:   # Y is index
     intersect_set = symbol_locations & border_points
     if len(intersect_set) > 0:
         part1_answer += number
+#print(number_list)
 
 part2_answer = 0
 for gx, gy in gear_locations:
