@@ -17,7 +17,6 @@ for t in range(len(total_time)):
         distance_travelled = (total_time[t] - i) * i
         if distance_travelled > distance_rec[t]:
             possibilities += 1
-    print(possibilities)
     record_beaters.append(possibilities)
 result = 1
 for w in record_beaters:
