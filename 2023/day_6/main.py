@@ -51,5 +51,5 @@ def part_two():
     return wins
 
 
-# part 2
+# Part 2
 print(part_two())
