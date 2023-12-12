@@ -124,10 +124,6 @@ ordered_db_lists = []
 for array in all_lists:
     if array:
         ordered_db_lists.extend(reorder(array))
-
-print(ordered_db_lists)
-
-
 # Part 1
 print(first_part(ordered_db_lists))
 
