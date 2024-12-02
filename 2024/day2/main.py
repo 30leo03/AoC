@@ -13,9 +13,7 @@ def is_linear(level):
 
 def main(file):
     with open(file) as f:
-        lines = f.readlines()
-
-    data = [[int(x) for x in line.strip().split()] for line in lines]
+        data = [[int(x) for x in line.strip().split()] for line in f.readlines()]
 
     safe_count = 0
     unsafe_levels = []
