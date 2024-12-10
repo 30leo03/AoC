@@ -1,81 +1,88 @@
 
-
-def get_guard_position(lab_map, guard_symbol):
-    for r in lab_map:
-        if guard_symbol in r:
-            return [lab_map.index(r), r.index(guard_symbol)]
+import copy
 
 
-def turn(cur_direction):
-    match cur_direction:
-        case '^':
-            return '>'
-        case '>':
-            return 'v'
-        case 'v':
-            return '<'
-        case '<':
-            return '^'
+def read_map(file):
+    with open(file, 'r') as f:
+        return [list(line.rstrip('\n')) for line in f]
 
 
-def walk(direction, x_pos, y_pos):
+def get_guard_start(lab_map):
+    directions = ['^', '>', 'v', '<']
+    for y, row in enumerate(lab_map):
+        for x, cell in enumerate(row):
+            if cell in directions:
+                return y, x, cell
+    return None, None, None
+
+
+def turn_right(direction):
     match direction:
-        case '^':
-            return [y_pos - 1, x_pos]
-        case '>':
-            return [y_pos, x_pos + 1]
-        case 'v':
-            return [y_pos + 1, x_pos]
-        case '<':
-            return [y_pos, x_pos - 1]
+        case '^': return '>'
+        case '>': return 'v'
+        case 'v': return '<'
+        case '<': return '^'
 
 
-def patrol(lab_map):
-    direction = '^'
-    start_pos = get_guard_position(lab_map, direction)
-    lab_map[start_pos[0]][start_pos[1]] = 'X'
-    print(start_pos)
+def step_forward(direction, y, x):
+    match direction:
+        case '^': return y - 1, x
+        case 'v': return y + 1, x
+        case '<': return y, x - 1
+        case '>': return y, x + 1
 
-    current_pos = start_pos
 
+def simulate_guard(lab_map, start_y, start_x, start_dir):
+
+    direction = start_dir
+    y, x = start_y, start_x
+    visited_states = set()
+    visited_states.add((direction, y, x))
     fields_walked = 1
 
     while True:
-        y_pos, x_pos = current_pos
+        new_y, new_x = step_forward(direction, y, x)
 
-        try:
-            match direction:
-                case '^':
-                    next_pos = lab_map[y_pos - 1][x_pos]
-                case 'v':
-                    next_pos = lab_map[y_pos + 1][x_pos]
-                case '<':
-                    next_pos = lab_map[y_pos][x_pos - 1]
-                case '>':
-                    next_pos = lab_map[y_pos][x_pos + 1]
-                case _:
-                    next_pos = None
+        # Check bounds
+        if not (0 <= new_y < len(lab_map) and 0 <= new_x < len(lab_map[0])):
+            return fields_walked
 
-            if next_pos == '.' or next_pos == 'X':
-                current_pos = walk(direction, x_pos=x_pos, y_pos=y_pos)
-                if next_pos == '.':
-                    fields_walked += 1
-                    lab_map[current_pos[0]][current_pos[1]] = 'X'
-            elif next_pos == '#':
-                direction = turn(direction)
+        next_cell = lab_map[new_y][new_x]
 
-        except IndexError:
-            break
+        if next_cell == '#':
+            direction = turn_right(direction)
+        else:
+            y, x = new_y, new_x
+            fields_walked += 1
 
-    return fields_walked
+            state = (direction, y, x)
+            if state in visited_states:
+                return 'loop'
+            visited_states.add(state)
+
+
+def check_for_loop(lab_map, start_y, start_x, start_dir, test_y, test_x):
+    temp_map = copy.deepcopy(lab_map)
+    temp_map[test_y][test_x] = '#'
+    result = simulate_guard(temp_map, start_y, start_x, start_dir)
+    return result == 'loop'
 
 
 def main(file):
-    with open(file, 'r') as f:
-        raster = [list(y[0]) for y in [x.strip().split() for x in f.readlines()]]
+    lab_map = read_map(file)
+    start_y, start_x, start_dir = get_guard_start(lab_map)
 
-    print(patrol(raster))
+    print(simulate_guard(lab_map, start_y, start_x, start_dir))
 
+    lab_map[start_y][start_x] = '.'
+    loop_counter = 0
+    for y in range(len(lab_map)):
+        for x in range(len(lab_map[0])):
+            if (y, x) != (start_y, start_x) and lab_map[y][x] == '.':
+                if check_for_loop(lab_map, start_y, start_x, start_dir, y, x):
+                    loop_counter += 1
+
+    print(loop_counter)
 
 if __name__ == '__main__':
     main('input.txt')

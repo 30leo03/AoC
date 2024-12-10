@@ -6,7 +6,7 @@ def rules_top_sort(rules, updates):
     for idx, update in enumerate(updates):
         relevant_rules = [(a, b) for a, b in rules if a in update and b in update]
 
-        # had 2 google this
+        # had 2 google thisdedi3608
         adj = defaultdict(list)
         in_degree = defaultdict(int)
         for node in update:
